@@ -66,7 +66,9 @@ function handleDefaultError(error: unknown) {
 }
 
 export function handleApiError(error: unknown): NextResponse {
+  console.log(error.code);
   if (error && typeof error === 'object' && 'code' in error) {
+    console.log("entrou no if");
     const response = handleDatabaseError(error as PrismaClientKnownRequestError)
     return response
   }

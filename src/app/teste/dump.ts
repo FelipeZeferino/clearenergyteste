@@ -1,24 +1,4 @@
-"use client"
-import { useForm } from "react-hook-form";
-
-type ConsumptionFormData = {
-  monthlyBill: number;
-  state: string;
-  city: string;
-  supplyType: SupplyType;
-  name: string;
-  email: string;
-  phone: string;
-  cpf: string;
-};
-
-type Simulation = {
-  yearly: number;
-  threeYears: number;
-  fiveYears: number;
-};
-
-export default function Form() {
+function Form() {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const onSubmit = data => console.log(data);
   console.log(errors);
