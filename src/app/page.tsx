@@ -2,6 +2,10 @@
 import React, { useState } from 'react';
 import { Zap, Leaf, Calculator, TrendingDown, Phone, Mail, User, MapPin, DollarSign } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod'
+import Header from './components/Header';
+import Features from './components/Features';
+import Footer from './components/Footer';
 
 const CleanEnergySimulator = () => {
   const [step, setStep] = useState(1);
@@ -119,32 +123,7 @@ const CleanEnergySimulator = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-green-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="bg-green-500 p-2 rounded-lg">
-                <Zap className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Clean Energy</h1>
-                <p className="text-sm text-gray-600">Energia renovável para o futuro</p>
-              </div>
-            </div>
-            <div className="hidden md:flex items-center space-x-6 text-sm text-gray-600">
-              <div className="flex items-center space-x-1">
-                <Phone className="h-4 w-4 text-green-500" />
-                <span>(11) 9999-9999</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <Mail className="h-4 w-4 text-green-500" />
-                <span>contato@cleanenergy.com</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
+      <Header/>
       {/* Hero Section */}
       <section className="relative py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
@@ -424,52 +403,8 @@ const CleanEnergySimulator = () => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="bg-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-gray-900 mb-4">Por que escolher a Clean Energy?</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <TrendingDown className="h-8 w-8 text-green-600" />
-              </div>
-              <h4 className="text-xl font-semibold text-gray-900 mb-2">Economia Garantida</h4>
-              <p className="text-gray-600">Até 25% de desconto na sua conta de energia elétrica</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Leaf className="h-8 w-8 text-green-600" />
-              </div>
-              <h4 className="text-xl font-semibold text-gray-900 mb-2">100% Renovável</h4>
-              <p className="text-gray-600">Energia limpa e sustentável para o meio ambiente</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="h-8 w-8 text-green-600" />
-              </div>
-              <h4 className="text-xl font-semibold text-gray-900 mb-2">Líder do Mercado</h4>
-              <p className="text-gray-600">Experiência e confiabilidade no mercado livre de energia</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="flex items-center justify-center space-x-3 mb-4">
-            <div className="bg-green-500 p-2 rounded-lg">
-              <Zap className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-xl font-bold">Clean Energy</span>
-          </div>
-          <p className="text-gray-400 text-sm">
-            © 2025 Clean Energy. Todos os direitos reservados. | Energia renovável para um futuro sustentável.
-          </p>
-        </div>
-      </footer>
+      <Features/>
+      <Footer/>
     </div>
   );
 };
