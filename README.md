@@ -1,4 +1,3 @@
-Beleza, vou mandar direto o README para rodar local e no deploy com banco via Docker Compose.
 
 ---
 
