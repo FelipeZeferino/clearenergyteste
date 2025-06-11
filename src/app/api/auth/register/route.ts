@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { createAdminSchema } from "@/features/admin/dtos/adminDto";
+import { createAdminSchema } from "@/features/admin/schemas/adminSchema";
 import { db } from "@/server/db";
 import { handleApiError } from "../../_utils/errorHandler";
 import bcrypt from 'bcrypt'

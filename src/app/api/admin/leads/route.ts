@@ -1,5 +1,6 @@
 import { db } from "@/server/db";
 import { handleApiError } from "../../_utils/errorHandler";
+import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -15,21 +16,21 @@ export async function GET() {
             monthlyBill: true,
             city: true,
             state: true,
-            supplyType: true
-          }
-        }
+            supplyType: true,
+          },
+        },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
 
-    return Response.json({
+    return NextResponse.json({
       success: true,
       count: leads.length,
-      data: leads
+      data: leads,
     });
   } catch (error) {
-    return handleApiError(error)
+    return handleApiError(error);
   }
 }
