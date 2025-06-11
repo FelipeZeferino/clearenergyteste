@@ -4,25 +4,15 @@ services:
   postgres:
     image: postgres:latest
     container_name: clearenergyteste-postgres
-    hostname: c3bfab477c4a
-    mac_address: 02:42:ac:11:00:02
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
       POSTGRES_DB: clearenergyteste
-      PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/17/bin
-      GOSU_VERSION: 1.17
-      LANG: en_US.utf8
-      PG_MAJOR: 17
-      PG_VERSION: 17.4-1.pgdg120+2
-      PGDATA: /var/lib/postgresql/data
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    restart: "no"
-    network_mode: bridge
-    runtime: runc
+    restart: unless-stopped
 
 volumes:
   pgdata:
