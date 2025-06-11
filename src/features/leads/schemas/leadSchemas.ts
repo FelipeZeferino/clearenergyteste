@@ -33,7 +33,39 @@ export const newLeadFormSchema = z.object({
   }),
 });
 
-export const leadDiscountSchema = z.object({
-  currentMonthlyBill: z.number().nonnegative(),
-  discount: z.number(),
+export const DeleteLeadParamsSchema = z.object({
+  id: z.string(),
 });
+
+export type DiscountProjection = {
+  years: number;
+  totalWithoutDiscount: number;
+  totalWithDiscount: number;
+};
+
+
+export interface ApiLeadResponse {
+  sucess: boolean,
+  count: number,
+  data: [{
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  createdAt: string;
+  energyConsumptionData: {
+    monthlyBill: number;
+    city: string;
+    state: string;
+    supplyType: string;
+  };
+  }]
+}
+
+export interface LeadData {
+  id: string,
+  name: string,
+  city: string,
+  state: string,
+  monthlyBill: number
+}

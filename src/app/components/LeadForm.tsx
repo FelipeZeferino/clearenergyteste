@@ -5,35 +5,70 @@ import { Calculator, DollarSign, Leaf, Mail, MapPin, Phone, TrendingDown, User }
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod'
-import { newLeadFormSchema } from '@/features/leads/dtos/leadDto';
-import axiosInstance from '@/features/axios/axiosInstance';
-import { z } from 'zod'
+import {
+  newLeadFormSchema,
+  type DiscountProjection,
+} from "@/features/leads/schemas/leadSchemas";
+import axiosInstance from "@/features/axios/axiosInstance";
+import { type z } from "zod";
+import type { newLeadResponse } from "../api/_utils/responseTypes";
+import { toast } from "sonner";
+import axios from "axios";
 
 export default function LeadForm() {
-  const { register, handleSubmit, formState: { errors } } = useForm({ resolver: zodResolver(newLeadFormSchema) });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({ resolver: zodResolver(newLeadFormSchema) });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [simulation, setSimulation] = useState<
+    undefined | DiscountProjection[]
+  >(undefined);
 
   const onSubmit = async (data: z.infer<typeof newLeadFormSchema>) => {
-    console.log(data)
+    setIsLoading(true);
+    setError(null);
     try {
-      console.log('entrou')
-      const response = await axiosInstance.post('/leads', data);
-      console.log(response);
-    } catch (error: any) {
-      console.error('Erro ao enviar os dados do lead:', error?.message || error);
+      const response: newLeadResponse = await axiosInstance.post(
+        "/leads",
+        data,
+      );
+      setStep(3);
+      console.log(response.data.data);
+      setSimulation(response.data.data);
+    } catch (error) {
+      if (
+        axios.isAxiosError(error) &&
+        error.response?.status === 409 &&
+        error.response.data?.code === "DUPLICATE_FIELD"
+      ) {
+        toast.error(
+          `${error.response.data.message} Campo: ${error.response.data.field}`,
+        );
+      } else {
+        toast.error("Erro inesperado ao tentar enviar os dados.");
+        console.error(error);
+      }
+      setError(error as string);
+      setStep(2);
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
 
   const [step, setStep] = useState(1);
-    
-      const [simulation, setSimulation] = useState<leadDiscount>(null);
-    
-      const handleNextStep = () => {
-        setStep(prevStep => prevStep + 1)
-      };
-    
-      const handlePrevStep = () => {
-        setStep(step - 1);
-      };
+
+  const handleNextStep = () => {
+    setStep((prevStep) => prevStep + 1);
+  };
+
+  const handlePrevStep = () => {
+    setStep(step - 1);
+  };
 
   return (
     <>
@@ -105,7 +140,7 @@ export default function LeadForm() {
                       </label>
                       <input
                         type="number"
-                        step="0.01"
+                        step="1.0"
                         placeholder="Ex: 350,00"
                         className={`w-full border px-4 py-3 ${errors.energyConsumptionData?.monthlyBill ? "border-red-500" : "border-gray-300"} rounded-lg focus:border-transparent focus:ring-2 focus:ring-green-500`}
                         {...register("energyConsumptionData.monthlyBill", {
@@ -320,94 +355,110 @@ export default function LeadForm() {
             </form>
 
             {/* Step 3: Simulação */}
-            {step === 3 && simulation && (
+            {step === 3 && (
               <div className="p-8">
-                <div className="mb-8 text-center">
-                  <h3 className="mb-2 text-2xl font-bold text-gray-900">
-                    Sua Economia Simulada
-                  </h3>
-                  <p className="text-gray-600">
-                    Veja quanto você pode economizar com a Clean Energy
-                  </p>
-                </div>
-
-                <div className="mb-8 rounded-lg border border-green-200 bg-green-50 p-6">
-                  <div className="text-center">
-                    <p className="mb-1 text-sm text-green-700">
-                      Economia mensal
-                    </p>
-                    <p className="text-3xl font-bold text-green-600">
-                      {formatCurrency(simulation.economiaMensal)}
-                    </p>
-                    <p className="mt-1 text-sm text-gray-600">
-                      25% de desconto aplicado
-                    </p>
+                {isLoading ? (
+                  // SKELETON
+                  <div className="animate-pulse space-y-6">
+                    <div className="mx-auto h-6 w-1/3 rounded bg-gray-200" />
+                    <div className="mx-auto h-4 w-1/2 rounded bg-gray-100" />
+                    <div className="h-32 rounded-lg bg-green-100" />
+                    <div className="space-y-4">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="h-24 rounded-lg bg-gray-100" />
+                      ))}
+                    </div>
                   </div>
-                </div>
+                ) : simulation ? (
+                  <>
+                    <div className="mb-8 text-center">
+                      <h3 className="mb-2 text-2xl font-bold text-gray-900">
+                        Sua Economia Simulada
+                      </h3>
+                      <p className="text-gray-600">
+                        Veja quanto você pode economizar com a Clean Energy
+                      </p>
+                    </div>
 
-                <div className="space-y-6">
-                  {[
-                    { label: "1 ano", data: simulation.economia1Ano },
-                    { label: "3 anos", data: simulation.economia3Anos },
-                    { label: "5 anos", data: simulation.economia5Anos },
-                  ].map((period, index) => (
-                    <div key={index} className="rounded-lg bg-gray-50 p-6">
-                      <h4 className="mb-4 text-lg font-semibold text-gray-900">
-                        Economia em {period.label}
-                      </h4>
-                      <div className="grid grid-cols-1 gap-4 text-center md:grid-cols-3">
-                        <div>
-                          <p className="text-sm text-gray-600">Valor atual</p>
-                          <p className="text-lg font-semibold text-red-600">
-                            {formatCurrency(period.data.totalAtual)}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600">
-                            Com Clean Energy
-                          </p>
-                          <p className="text-lg font-semibold text-blue-600">
-                            {formatCurrency(period.data.totalComDesconto)}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600">
-                            Economia total
-                          </p>
-                          <p className="text-lg font-semibold text-green-600">
-                            {formatCurrency(period.data.economia)}
-                          </p>
-                        </div>
+                    <div className="mb-8 rounded-lg border border-green-200 bg-green-50 p-6">
+                      <div className="text-center">
+                        <p className="mb-1 text-sm text-green-700">
+                          Economia mensal
+                        </p>
+                        <p className="mt-1 text-sm text-gray-600">
+                          Até 25% de desconto na fatura!
+                        </p>
                       </div>
                     </div>
-                  ))}
-                </div>
 
-                <div className="mt-8 text-center">
-                  <p className="mb-4 text-sm text-gray-600">
-                    Nossa equipe comercial entrará em contato para elaborar sua
-                    proposta personalizada!
+                    <div className="space-y-6">
+                      {simulation.map((period, index) => {
+                        const economia =
+                          period.totalWithoutDiscount -
+                          period.totalWithDiscount;
+                        return (
+                          <div
+                            key={index}
+                            className="rounded-lg bg-gray-50 p-6"
+                          >
+                            <h4 className="mb-4 text-lg font-semibold text-gray-900">
+                              Economia em {period.years}{" "}
+                              {period.years === 1 ? "ano" : "anos"}
+                            </h4>
+                            <div className="grid grid-cols-1 gap-4 text-center md:grid-cols-3">
+                              <div>
+                                <p className="text-sm text-gray-600">
+                                  Valor atual
+                                </p>
+                                <p className="text-lg font-semibold text-red-600">
+                                  {period.totalWithoutDiscount}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-gray-600">
+                                  Com Clean Energy
+                                </p>
+                                <p className="text-lg font-semibold text-blue-600">
+                                  {period.totalWithDiscount}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-gray-600">
+                                  Economia total
+                                </p>
+                                <p className="text-lg font-semibold text-green-600">
+                                  {economia}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <div className="mt-8 text-center">
+                      <p className="mb-4 text-sm text-gray-600">
+                        Nossa equipe comercial entrará em contato para elaborar
+                        sua proposta personalizada!
+                      </p>
+                      <button
+                        onClick={() => {
+                          setStep(1);
+                          reset();
+                          setSimulation(undefined);
+                        }}
+                        className="rounded-lg bg-green-500 px-8 py-3 font-semibold text-white transition-colors duration-200 hover:bg-green-600"
+                      >
+                        Nova Simulação
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-center text-red-500">
+                    Erro ao calcular simulação. Tente novamente.
+                    {error}
                   </p>
-                  <button
-                    onClick={() => {
-                      setStep(1);
-                      setFormData({
-                        monthlyBill: "",
-                        city: "",
-                        estado: "",
-                        tipoFornecimento: "",
-                        nome: "",
-                        email: "",
-                        telefone: "",
-                        cpf: "",
-                      });
-                      setSimulation(null);
-                    }}
-                    className="rounded-lg bg-green-500 px-8 py-3 font-semibold text-white transition-colors duration-200 hover:bg-green-600"
-                  >
-                    Nova Simulação
-                  </button>
-                </div>
+                )}
               </div>
             )}
           </div>

@@ -1,13 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { type NextRequest } from "next/server";
 import { db } from "@/server/db";
-import { createLeadSchema } from "@/features/leads/dtos/leadDto";
+import { createLeadSchema } from "@/features/leads/schemas/leadSchemas";
 import { handleApiError } from "../_utils/errorHandler";
-import {
-  calculateAnnualSavings,
-  calculateDiscount,
-} from "@/features/leads/services/discountCalculatorService";
-import { Micro_5, Rock_3D } from "next/font/google";
+import { calculateAnnualSavings } from "@/features/leads/services/discountCalculatorService";
 
 export async function GET() {
   try {

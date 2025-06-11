@@ -1,4 +1,4 @@
-import { adminLoginSchema } from "@/features/admin/dtos/adminDto";
+import { adminLoginSchema } from "@/features/admin/schemas/adminSchema";
 import { db } from "@/server/db";
 import type { NextRequest } from "next/server";
 import bcrypt from "bcrypt";
@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 import { env } from "@/env";
 import { handleApiError } from "../_utils/errorHandler";
 import { cookies } from "next/headers";
- 
+
 export async function POST(request: NextRequest) {
   try {
     const loginData: unknown = await request.json();
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     const token = jwt.sign(
       { id: admin.id, email: admin.email },
-      env.JWT_SECRET as string,
+      env.JWT_SECRET,
       { expiresIn: "8h" },
     );
 
@@ -44,9 +44,9 @@ export async function POST(request: NextRequest) {
 
     cookieSetter.set("token", token, {
       httpOnly: true,
-      path: "/admin",
+      path: "/",
       maxAge: 60 * 60 * 8,
-      });
+    });
 
     return Response.json({ success: true, token });
   } catch (error) {
